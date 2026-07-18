@@ -1,0 +1,18 @@
+(require "strcase.hx/cogs/strcase-core.scm")
+
+(define (check label actual expected)
+  (when (not (equal? actual expected))
+    (error! (string-append label ": expected " expected ", got " actual))))
+
+(check "snake from words" (strcase->snake "hello world") "hello_world")
+(check "snake from camel" (strcase->snake "helloWorld") "hello_world")
+(check "snake from acronym" (strcase->snake "HTTP response_code") "http_response_code")
+(check "kebab" (strcase->kebab "hello_world") "hello-world")
+(check "camel" (strcase->camel "hello_world") "helloWorld")
+(check "camel from screaming snake" (strcase->camel "NON_ALPHANUMERIC") "nonAlphanumeric")
+(check "pascal" (strcase->pascal "hello_world") "HelloWorld")
+(check "pascal from screaming snake" (strcase->pascal "NON_ALPHANUMERIC") "NonAlphanumeric")
+(check "screaming snake" (strcase->screaming-snake "hello-world") "HELLO_WORLD")
+(check "snake from screaming snake" (strcase->snake "NON_ALPHANUMERIC") "non_alphanumeric")
+(check "title" (strcase->title "hello_world") "Hello World")
+(check "title from screaming snake" (strcase->title "NON_ALPHANUMERIC") "Non Alphanumeric")
