@@ -8,9 +8,11 @@
          strcase-pascal
          strcase-screaming-snake
          strcase-title
-         strcase-cycle)
-
-(define *strcase-cycle-index* 0)
+         strcase-smart-case-upper
+         strcase-smart-case-lower
+         strcase-smart-case-dictionary
+         strcase-set-smart-case-dictionary!
+         strcase-extend-smart-case-dictionary!)
 
 (define (selection-text)
   (helix.static.current-highlighted-text!))
@@ -55,18 +57,11 @@
   (replace-selection-with-transform strcase->title "Title Case"))
 
 ;;@doc
-;; Cycle the current selection through snake_case, camelCase, PascalCase, kebab-case, SCREAMING_SNAKE_CASE, and Title Case.
-(define (strcase-cycle)
-  (define cycle-cases
-    (list (list "snake_case" strcase-snake)
-          (list "camelCase" strcase-camel)
-          (list "PascalCase" strcase-pascal)
-          (list "kebab-case" strcase-kebab)
-          (list "SCREAMING_SNAKE_CASE" strcase-screaming-snake)
-          (list "Title Case" strcase-title)))
-  (let* ([case (list-ref cycle-cases *strcase-cycle-index*)]
-         [label (list-ref case 0)]
-         [command (list-ref case 1)])
-    (set! *strcase-cycle-index* (modulo (+ *strcase-cycle-index* 1)
-                                        (length cycle-cases)))
-    (command)))
+;; Convert the current selection to Go-style exported smart case.
+(define (strcase-smart-case-upper)
+  (replace-selection-with-transform strcase->smart-case-upper "SmartCase"))
+
+;;@doc
+;; Convert the current selection to Go-style unexported smart case.
+(define (strcase-smart-case-lower)
+  (replace-selection-with-transform strcase->smart-case-lower "smartCase"))

@@ -3,7 +3,54 @@
          strcase->camel
          strcase->pascal
          strcase->screaming-snake
-         strcase->title)
+         strcase->title
+         strcase->smart-case-upper
+         strcase->smart-case-lower
+         strcase-smart-case-dictionary
+         strcase-set-smart-case-dictionary!
+         strcase-extend-smart-case-dictionary!)
+
+(define *strcase-default-smart-case-dictionary*
+  (list "ACL"
+        "API"
+        "ASCII"
+        "CPU"
+        "CSS"
+        "DNS"
+        "EOF"
+        "GUID"
+        "HTML"
+        "HTTP"
+        "HTTPS"
+        "ID"
+        "IP"
+        "JSON"
+        "LHS"
+        "QPS"
+        "RAM"
+        "RHS"
+        "RPC"
+        "SLA"
+        "SMTP"
+        "SQL"
+        "SSH"
+        "TCP"
+        "TLS"
+        "TTL"
+        "UDP"
+        "UI"
+        "UID"
+        "UUID"
+        "URI"
+        "URL"
+        "UTF8"
+        "VM"
+        "XML"
+        "XMPP"
+        "XSRF"
+        "XSS"))
+
+(define *strcase-smart-case-dictionary* *strcase-default-smart-case-dictionary*)
 
 (define (ascii-upper? char)
   (and (char>=? char #\A) (char<=? char #\Z)))
@@ -63,6 +110,42 @@
       (string-append (string-upcase (substring word 0 1))
                      (string-downcase (substring word 1 (string-length word))))))
 
+(define (remove-dictionary-key key dictionary)
+  (filter (lambda (entry) (not (string-ci=? entry key))) dictionary))
+
+(define (prepend-dictionary-entry entry dictionary)
+  (cons entry (remove-dictionary-key entry dictionary)))
+
+(define (prepend-dictionary-entries entries dictionary)
+  (if (null? entries)
+      dictionary
+      (prepend-dictionary-entries (cdr entries)
+                                  (prepend-dictionary-entry (car entries) dictionary))))
+
+(define (lookup-smart-case-word word dictionary)
+  (if (null? dictionary)
+      #false
+      (let ([entry (car dictionary)])
+        (if (string-ci=? entry word)
+            entry
+            (lookup-smart-case-word word (cdr dictionary))))))
+
+(define (smart-case-word word)
+  (let ([dictionary-entry (lookup-smart-case-word word *strcase-smart-case-dictionary*)])
+    (if dictionary-entry
+        dictionary-entry
+        (capitalize-word word))))
+
+(define (strcase-smart-case-dictionary)
+  *strcase-smart-case-dictionary*)
+
+(define (strcase-set-smart-case-dictionary! dictionary)
+  (set! *strcase-smart-case-dictionary* dictionary))
+
+(define (strcase-extend-smart-case-dictionary! dictionary)
+  (set! *strcase-smart-case-dictionary*
+        (prepend-dictionary-entries dictionary *strcase-smart-case-dictionary*)))
+
 (define (join-with words separator)
   (if (null? words)
       ""
@@ -91,3 +174,13 @@
 
 (define (strcase->title value)
   (join-with (map capitalize-word (strcase-words value)) " "))
+
+(define (strcase->smart-case-upper value)
+  (apply string-append (map smart-case-word (strcase-words value))))
+
+(define (strcase->smart-case-lower value)
+  (let ([words (strcase-words value)])
+    (if (null? words)
+        ""
+        (string-append (string-downcase (car words))
+                       (apply string-append (map smart-case-word (cdr words)))))))
