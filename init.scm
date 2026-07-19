@@ -1,5 +1,7 @@
 (require (prefix-in strcase. "strcase.hx/cogs/strcase-hx.scm"))
+(require-builtin helix/core/keymaps as helix.keymaps.)
 (require (only-in "helix/keymaps.scm" keymap))
+(require (only-in "helix/configuration.scm" get-keybindings set-keybindings!))
 
 (provide
   strcase-snake
@@ -36,7 +38,19 @@
                        (g ":strcase-smart-case-lower")
                        (G ":strcase-smart-case-upper")
                        (u "switch_to_uppercase")
-                       (l "switch_to_lowercase")))))
+                       (l "switch_to_lowercase"))))
+  (let ([keybindings (get-keybindings)])
+    (helix.keymaps.keymap-update-documentation!
+     keybindings
+     (hash "strcase-snake" "Convert the current selection to snake_case."
+           "strcase-kebab" "Convert the current selection to kebab-case."
+           "strcase-camel" "Convert the current selection to camelCase."
+           "strcase-pascal" "Convert the current selection to PascalCase."
+           "strcase-screaming-snake" "Convert the current selection to SCREAMING_SNAKE_CASE."
+           "strcase-title" "Convert the current selection to Title Case."
+           "strcase-smart-case-upper" "Convert the current selection to Go-style exported smart case."
+           "strcase-smart-case-lower" "Convert the current selection to Go-style unexported smart case."))
+    (set-keybindings! keybindings)))
 
 ;;@doc
 ;; Convert the current selection to snake_case.

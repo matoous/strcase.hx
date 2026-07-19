@@ -71,14 +71,14 @@ the plugin:
 
 ```scheme
 (strcase-extend-smart-case-dictionary!
-  (list "Haxe" "Http"))
+  (list "HAXE" "HTTP" "RFC"))
 ```
 
 Replace the full dictionary with:
 
 ```scheme
 (strcase-set-smart-case-dictionary!
-  (list "Api"))
+  (list "API"))
 ```
 
 Examples:
